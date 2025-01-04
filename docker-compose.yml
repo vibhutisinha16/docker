@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+  db:
+    image: mariadb:latest
+    container_name: nextcloud-db
+    environment:
+      MYSQL_ROOT_PASSWORD: examplepassword
+      MYSQL_PASSWORD: examplepassword
+      MYSQL_USER: nextclouduser
+      MYSQL_DATABASE: nextcloud
+    volumes:
+      - /mnt/nextcloud:/var/lib/mysql
+    networks:
+      - nextcloud-network
+
+  nextcloud:
+    image: nextcloud:latest
+    container_name: nextcloud
+    environment:
+      MYSQL_PASSWORD: examplepassword
+      MYSQL_USER: nextclouduser
+      MYSQL_HOST: db
+      MYSQL_DATABASE: nextcloud
+    ports:
+      - "80:80"
+    volumes:
+      - /mnt/nextcloud/data:/var/www/html
+    networks:
+      - nextcloud-network
+    depends_on:
+      - db
+
+volumes:
+  nextcloud-db-data:
+    driver: local
+  nextcloud-data:
+    driver: local
+
+networks:
+  nextcloud-network:
+    driver: bridge
